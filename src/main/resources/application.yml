@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: short-url-system
+  
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/short_link?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 12345678
+
+  # Redis 配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 12345678
+      database: 0
+
+# MyBatis Plus 配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+
+# Knife4j & Swagger 配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  # 关键：只扫描包路径，不折腾分组
+  packages-to-scan: com.plumliu.shorturl
+
+# Knife4j 增强 UI 配置
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+logging:
+  file:
+    name: logs/app.log   # 日志文件路径
+  level:
+    com.plumliu.shorturl: debug
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{40} - %msg%n"
