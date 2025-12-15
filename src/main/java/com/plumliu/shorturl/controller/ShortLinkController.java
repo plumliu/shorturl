@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.plumliu.shorturl.domain.entity.ShortLinkDO;
 import com.plumliu.shorturl.service.ShortLinkService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import java.io.IOException;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "短链接管理接口")
 public class ShortLinkController {
 
     private final ShortLinkService shortLinkService;
