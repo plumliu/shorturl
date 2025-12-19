@@ -1,5 +1,6 @@
 package com.plumliu.shorturl.controller;
 
+import com.plumliu.shorturl.common.convention.result.Result;
 import com.plumliu.shorturl.domain.dto.UserRegisterReqDTO;
 import com.plumliu.shorturl.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,9 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -21,9 +20,26 @@ public class UserController {
 
     @Operation(summary = "用户注册")
     @PostMapping("/api/user/register")
-    public String register(@Valid @RequestBody UserRegisterReqDTO requestParam) {
+    public Result<Void> register(@Valid @RequestBody UserRegisterReqDTO requestParam) {
         userService.register(requestParam);
-        return "注册成功";
+        return Result.success();
     }
 
+    @Operation(summary = "检查用户名是否存在")
+    @GetMapping("/api/user/has-username")
+    public Result<Boolean> hasUsername(@RequestParam("username") String username) {
+        return Result.success(userService.hasUsername(username));
+    }
+
+    @Operation(summary = "检查邮箱是否存在")
+    @GetMapping("/api/user/has-mail")
+    public Result<Boolean> hasMail(@RequestParam("mail") String mail) {
+        return Result.success(userService.hasMail(mail));
+    }
+
+    @Operation(summary = "检查手机号是否存在")
+    @GetMapping("/api/user/has-phone")
+    public Result<Boolean> hasPhone(@RequestParam("phone") String phone) {
+        return Result.success(userService.hasPhone(phone));
+    }
 }

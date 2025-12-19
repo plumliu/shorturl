@@ -12,4 +12,27 @@ public interface UserService extends IService<UserDO> {
      */
     void register(UserRegisterReqDTO userRegisterReqDTO);
 
+
+    /**
+     *
+     * @param username 输入的用户名
+     * @return 用户名是否存在
+     */
+    boolean hasUsername(String username);
+
+    /**
+     *
+     * @param mail 输入的邮箱
+     * @return 邮箱是否存在
+     */
+    boolean hasMail(String mail);
+
+    /**
+     *
+     * @param phone 输入的手机号
+     * @return 手机号是否存在
+     */
+    boolean hasPhone(String phone);
+
+
 }
