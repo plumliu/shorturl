@@ -1,6 +1,7 @@
 package com.plumliu.shorturl.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.plumliu.shorturl.common.convention.result.Result;
 import com.plumliu.shorturl.domain.entity.ShortLinkDO;
 import com.plumliu.shorturl.service.ShortLinkService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,9 +23,9 @@ public class ShortLinkController {
 
     @Operation(summary = "创建短链接")
     @PostMapping("/api/short-link/save")
-    public String createShortLink(@RequestParam("originalUrl") String originalUrl) {
+    public Result<String> createShortLink(@RequestParam("originalUrl") String originalUrl) {
         String shortUrl = shortLinkService.createShortLink(originalUrl);
-        return shortLinkService.createShortLink(originalUrl);
+        return Result.success(shortUrl);
     }
 
     @Operation(summary = "短链接跳转")

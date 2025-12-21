@@ -1,6 +1,8 @@
 package com.plumliu.shorturl.controller;
 
 import com.plumliu.shorturl.common.convention.result.Result;
+import com.plumliu.shorturl.domain.dto.UserLoginReqDTO;
+import com.plumliu.shorturl.domain.dto.UserLoginRespDTO;
 import com.plumliu.shorturl.domain.dto.UserRegisterReqDTO;
 import com.plumliu.shorturl.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +19,13 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    @Operation(summary = "用户登录")
+    @PostMapping("/api/user/login")
+    public Result<UserLoginRespDTO> register(@Valid @RequestBody UserLoginReqDTO userLoginReqDTO) {
+        return Result.success(userService.login(userLoginReqDTO));
+    }
+
 
     @Operation(summary = "用户注册")
     @PostMapping("/api/user/register")

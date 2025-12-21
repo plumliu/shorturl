@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Throwable.class)
     public Result<Void> handleThrowable(Throwable set, HttpServletRequest request) {
-        log.error("系统未知错误: URL={}", request.getRequestURI(), set);
+        log.error("系统内部异常: URL={}", request.getRequestURI(), set);
         return Result.failure(BaseErrorCode.SYSTEM_ERROR.getCode(), BaseErrorCode.SYSTEM_ERROR.getMessage());
     }
 

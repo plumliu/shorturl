@@ -11,7 +11,9 @@ public enum UserErrorCode implements ErrorCode {
     USERNAME_EXIST(10001, "用户名已存在"),
     USER_EXIST(10002, "用户记录已存在"),
     PHONE_EXIST(10003, "手机号已存在"),
-    MAIL_EXIST(10004, "邮箱已存在");
+    MAIL_EXIST(10004, "邮箱已存在"),
+    PASSWORD_ERROR(10005, "用户名或密码错误");
+
 
     private final Integer code;
     private final String message;

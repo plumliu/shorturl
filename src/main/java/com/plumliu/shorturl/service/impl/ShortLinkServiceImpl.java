@@ -1,7 +1,6 @@
 package com.plumliu.shorturl.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.plumliu.shorturl.common.convention.errorcode.ErrorCode;
 import com.plumliu.shorturl.common.convention.errorcode.ShortLinkErrorCode;
 import com.plumliu.shorturl.common.convention.exception.ClientException;
 import com.plumliu.shorturl.domain.entity.ShortLinkDO;
