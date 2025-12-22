@@ -22,18 +22,20 @@ public class Result<T> implements Serializable {
 
     private final String requestId;
 
-    public static Result<Void> success() {
+    public static Result<Void> success(String requestId) {
         return Result.<Void>builder()
                 .code(BaseErrorCode.SUCCESS.getCode())
                 .message(BaseErrorCode.SUCCESS.getMessage())
+                .requestId(requestId)
                 .build();
     }
 
-    public static <T> Result<T> success(T data) {
+    public static <T> Result<T> success(T data, String requestId) {
         return Result.<T>builder()
                 .code(BaseErrorCode.SUCCESS.getCode())
                 .message(BaseErrorCode.SUCCESS.getMessage())
                 .data(data)
+                .requestId(requestId)
                 .build();
     }
 
@@ -41,6 +43,15 @@ public class Result<T> implements Serializable {
         return Result.<Void>builder()
                 .code(code)
                 .message(message)
+                .build();
+    }
+
+    public Result<T> withRequestId(String requestId) {
+        return Result.<T>builder()
+                .code(code)
+                .message(message)
+                .data(data)
+                .requestId(requestId)
                 .build();
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,6 +33,9 @@ public class UserConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new RequestIdInterceptor())
+                .addPathPatterns("/**");
+
         registry.addInterceptor(new LoginInterceptor(redisTemplate))
                 .addPathPatterns("/**")
                 .excludePathPatterns(excludes);

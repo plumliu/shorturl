@@ -22,33 +22,32 @@ public class UserController {
 
     @Operation(summary = "用户登录")
     @PostMapping("/api/user/login")
-    public Result<UserLoginRespDTO> register(@Valid @RequestBody UserLoginReqDTO userLoginReqDTO) {
-        return Result.success(userService.login(userLoginReqDTO));
+    public UserLoginRespDTO register(@Valid @RequestBody UserLoginReqDTO userLoginReqDTO) {
+        return userService.login(userLoginReqDTO);
     }
 
 
     @Operation(summary = "用户注册")
     @PostMapping("/api/user/register")
-    public Result<Void> register(@Valid @RequestBody UserRegisterReqDTO requestParam) {
+    public void register(@Valid @RequestBody UserRegisterReqDTO requestParam) {
         userService.register(requestParam);
-        return Result.success();
     }
 
     @Operation(summary = "检查用户名是否存在")
     @GetMapping("/api/user/has-username")
-    public Result<Boolean> hasUsername(@RequestParam("username") String username) {
-        return Result.success(userService.hasUsername(username));
+    public Boolean hasUsername(@RequestParam("username") String username) {
+        return userService.hasUsername(username);
     }
 
     @Operation(summary = "检查邮箱是否存在")
     @GetMapping("/api/user/has-mail")
-    public Result<Boolean> hasMail(@RequestParam("mail") String mail) {
-        return Result.success(userService.hasMail(mail));
+    public Boolean hasMail(@RequestParam("mail") String mail) {
+        return userService.hasMail(mail);
     }
 
     @Operation(summary = "检查手机号是否存在")
     @GetMapping("/api/user/has-phone")
-    public Result<Boolean> hasPhone(@RequestParam("phone") String phone) {
-        return Result.success(userService.hasPhone(phone));
+    public Boolean hasPhone(@RequestParam("phone") String phone) {
+        return userService.hasPhone(phone);
     }
 }

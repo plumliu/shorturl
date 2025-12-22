@@ -23,9 +23,8 @@ public class ShortLinkController {
 
     @Operation(summary = "创建短链接")
     @PostMapping("/api/short-link/save")
-    public Result<String> createShortLink(@RequestParam("originalUrl") String originalUrl) {
-        String shortUrl = shortLinkService.createShortLink(originalUrl);
-        return Result.success(shortUrl);
+    public String createShortLink(@RequestParam("originalUrl") String originalUrl) {
+        return shortLinkService.createShortLink(originalUrl);
     }
 
     @Operation(summary = "短链接跳转")
