@@ -1,12 +1,14 @@
 package com.plumliu.shorturl.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.plumliu.shorturl.common.convention.result.Result;
+import com.plumliu.shorturl.domain.dto.ShortLinkCreateReqDTO;
 import com.plumliu.shorturl.domain.entity.ShortLinkDO;
 import com.plumliu.shorturl.service.ShortLinkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +25,13 @@ public class ShortLinkController {
 
     @Operation(summary = "创建短链接")
     @PostMapping("/api/short-link/save")
-    public String createShortLink(@RequestParam("originalUrl") String originalUrl) {
-        return shortLinkService.createShortLink(originalUrl);
+    public String createShortLink(@Valid @RequestBody ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
+        return shortLinkService.createShortLink(shortLinkCreateReqDTO);
     }
 
     @Operation(summary = "短链接跳转")
     @GetMapping("/s/{short-uri}")
-    public void restoreUrl(@PathVariable("short-uri") String shortUri, HttpServletResponse response) throws IOException {
+    public void restoreUrl(@NotBlank @PathVariable("short-uri") String shortUri, HttpServletResponse response) throws IOException {
 
         LambdaQueryWrapper<ShortLinkDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ShortLinkDO::getShortUri, shortUri);

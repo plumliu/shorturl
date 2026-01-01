@@ -14,7 +14,8 @@ public enum BaseErrorCode implements ErrorCode {
     PARAM_ERROR(401, "参数校验错误"),
     UNAUTHORIZED(402, "用户未授权"),
     INVALID_TOKEN(403, "Token无效或已过期"),
-    MISSING_REQUEST_ID(404, "requestId缺失"),
+    MISSING_REQUEST_ID(404, "X-Request-Id缺失"),
+    SERIALIZATION_FAILED(405, "序列化失败"),
 
     // 系统错误 (500段)
     SYSTEM_ERROR(500, "系统内部异常");

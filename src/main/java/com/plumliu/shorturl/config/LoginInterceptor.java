@@ -1,5 +1,6 @@
 package com.plumliu.shorturl.config;
 
+import cn.hutool.json.JSONUtil;
 import com.plumliu.shorturl.common.biz.user.UserContext;
 import com.plumliu.shorturl.common.convention.errorcode.BaseErrorCode;
 import com.plumliu.shorturl.common.convention.exception.ClientException;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Optional;
@@ -17,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class LoginInterceptor implements HandlerInterceptor {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -34,11 +36,17 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         String key = "login:token:" + token;
-        Object value = Optional.ofNullable(redisTemplate.opsForValue().get(key))
+        String jsonValue = Optional.ofNullable(stringRedisTemplate.opsForValue().get(key))
                 .orElseThrow(() -> new ClientException(BaseErrorCode.INVALID_TOKEN));
 
-        UserLoginRespDTO userLoginRespDTO = (UserLoginRespDTO) value;
-        redisTemplate.expire(key, 30, TimeUnit.MINUTES);
+        UserLoginRespDTO userLoginRespDTO = null;
+        try {
+            userLoginRespDTO = JSONUtil.toBean(jsonValue, UserLoginRespDTO.class);
+        } catch (Exception e) {
+            throw new ClientException(BaseErrorCode.SERIALIZATION_FAILED);
+        }
+
+        stringRedisTemplate.expire(key, 30, TimeUnit.MINUTES);
         UserContext.setUser(userLoginRespDTO);
 
         return true;

@@ -8,6 +8,7 @@ import com.plumliu.shorturl.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class UserController {
 
     @Operation(summary = "用户登录")
     @PostMapping("/api/user/login")
-    public UserLoginRespDTO register(@Valid @RequestBody UserLoginReqDTO userLoginReqDTO) {
+    public UserLoginRespDTO login(@Valid @RequestBody UserLoginReqDTO userLoginReqDTO) {
         return userService.login(userLoginReqDTO);
     }
 
@@ -35,19 +36,19 @@ public class UserController {
 
     @Operation(summary = "检查用户名是否存在")
     @GetMapping("/api/user/has-username")
-    public Boolean hasUsername(@RequestParam("username") String username) {
+    public Boolean hasUsername(@NotBlank @RequestParam("username") String username) {
         return userService.hasUsername(username);
     }
 
     @Operation(summary = "检查邮箱是否存在")
     @GetMapping("/api/user/has-mail")
-    public Boolean hasMail(@RequestParam("mail") String mail) {
+    public Boolean hasMail(@NotBlank @RequestParam("mail") String mail) {
         return userService.hasMail(mail);
     }
 
     @Operation(summary = "检查手机号是否存在")
     @GetMapping("/api/user/has-phone")
-    public Boolean hasPhone(@RequestParam("phone") String phone) {
+    public Boolean hasPhone(@NotBlank @RequestParam("phone") String phone) {
         return userService.hasPhone(phone);
     }
 }

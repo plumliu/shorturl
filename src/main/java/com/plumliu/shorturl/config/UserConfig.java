@@ -5,6 +5,7 @@ import com.plumliu.shorturl.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserConfig implements WebMvcConfigurer {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
     private final List<String> excludes = Arrays.asList(
             "/api/user/login",
@@ -36,7 +37,7 @@ public class UserConfig implements WebMvcConfigurer {
         registry.addInterceptor(new RequestIdInterceptor())
                 .addPathPatterns("/**");
 
-        registry.addInterceptor(new LoginInterceptor(redisTemplate))
+        registry.addInterceptor(new LoginInterceptor(stringRedisTemplate))
                 .addPathPatterns("/**")
                 .excludePathPatterns(excludes);
     }

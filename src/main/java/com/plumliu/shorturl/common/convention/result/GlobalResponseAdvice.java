@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.plumliu.shorturl.common.convention.errorcode.BaseErrorCode;
 import com.plumliu.shorturl.common.convention.exception.ClientException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.Optional;
 
-@RestControllerAdvice(basePackages = "com.plumliu.shorturl.controller")
+@Slf4j
+@RestControllerAdvice(basePackages = "com.plumliu.shorturl")
 public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -41,7 +43,8 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
         }
 
         // 由 GlobalExceptionHandler 捕获异常后返回的Result封装类, 业务的执行是失败的
-        if (body instanceof Result) {
+        if (body instanceof Result<?>) {
+            log.warn("异常类");
             return ((Result<?>) body).withRequestId(requestId);
         }
 

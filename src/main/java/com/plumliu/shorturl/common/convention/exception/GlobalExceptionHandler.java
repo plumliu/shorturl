@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -28,6 +29,19 @@ public class GlobalExceptionHandler {
         log.warn("参数校验异常: {}", errorMessage);
         return Result.failure(BaseErrorCode.PARAM_ERROR.getCode(), BaseErrorCode.PARAM_ERROR.getMessage() + "：" + errorMessage);
     }
+
+    @ExceptionHandler(value = MissingServletRequestParameterException.class)
+    public Result<Void> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        String parameterName = ex.getParameterName();
+        String parameterType = ex.getParameterType();
+
+        String message = String.format("缺少必需的请求参数: %s (类型: %s)", parameterName, parameterType);
+
+        log.warn("Missing request parameter: {}", message);
+
+        return Result.failure(BaseErrorCode.PARAM_ERROR.getCode(), BaseErrorCode.PARAM_ERROR.getMessage() + "; " + message);
+    }
+
 
     @ExceptionHandler(value = ClientException.class)
     public Result<Void> handleClientException(ClientException ex) {

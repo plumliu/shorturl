@@ -1,6 +1,7 @@
 package com.plumliu.shorturl.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plumliu.shorturl.common.convention.errorcode.UserErrorCode;
@@ -15,9 +16,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +33,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     private final PasswordEncoder passwordEncoder;
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
+
+    private static final DefaultRedisScript<Long> LUA_LOGIN_SCRIPT;
+
+    static {
+        LUA_LOGIN_SCRIPT = new DefaultRedisScript<>();
+        LUA_LOGIN_SCRIPT.setScriptText("""
+            local returnValue = 0
+            local oldToken = redis.call('GET', KEYS[1])
+            if oldToken and oldToken ~= '' then
+                redis.call('DEL', 'login:token:' .. oldToken)
+                returnValue = 1
+            end
+            redis.call('SET', KEYS[2], ARGV[2])
+            redis.call('EXPIRE', KEYS[2], ARGV[3] * 60)
+            redis.call('SET', KEYS[1], ARGV[1])
+            redis.call('EXPIRE', KEYS[1], ARGV[3] * 60)
+            return returnValue
+            """);
+        LUA_LOGIN_SCRIPT.setResultType(Long.class); // 设置返回值类型
+    }
 
     @Override
     public UserLoginRespDTO login(UserLoginReqDTO requestParam) {
@@ -45,13 +69,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             throw new ClientException(UserErrorCode.PASSWORD_ERROR);
         }
 
+        String userId = String.valueOf(userDO.getId());
         String token = UUID.randomUUID().toString();
+
+        String userLoginKey = "login:user:" + userId;
+        String tokenKey = "login:token:" + token;
 
         UserLoginRespDTO respDTO = BeanUtil.toBean(userDO, UserLoginRespDTO.class);
         respDTO.setToken(token);
+        String userInfoJson = JSONUtil.toJsonStr(respDTO);
 
-        String key = "login:token:" + token;
-        redisTemplate.opsForValue().set(key, respDTO, 30, TimeUnit.MINUTES);
+        Long result = stringRedisTemplate.execute(
+                LUA_LOGIN_SCRIPT,
+                Arrays.asList(userLoginKey, tokenKey),
+                token,
+                userInfoJson,
+                "30"
+        );
+
+        if (result != null && result == 1) {
+            log.warn("用户异地登录预警: 用户ID={}，旧Token已被强制踢下线", userId);
+        }
 
         return respDTO;
     }

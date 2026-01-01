@@ -1,17 +1,23 @@
 package com.plumliu.shorturl.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+
+
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_link")
-public class ShortLinkDO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ShortLinkDO extends BaseDO {
 
     @TableId(type = IdType.AUTO)
     private Long id;
+
+    private Long userId;
 
     private String domain;
 
@@ -21,7 +27,11 @@ public class ShortLinkDO {
 
     private String originalUrl;
 
-    private Integer clickNum;
+    private Integer totalPv;
+
+    private Integer totalUv;
+
+    private Integer totalUip;
 
     private String gid;
 
@@ -34,14 +44,5 @@ public class ShortLinkDO {
     private LocalDateTime validDate;
 
     private String description;
-
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
-
-    @TableLogic
-    private Integer deleted;
 
 }
