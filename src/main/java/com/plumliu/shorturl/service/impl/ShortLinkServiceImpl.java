@@ -2,6 +2,7 @@ package com.plumliu.shorturl.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plumliu.shorturl.common.biz.user.UserContext;
+import com.plumliu.shorturl.common.convention.errorcode.BaseErrorCode;
 import com.plumliu.shorturl.common.convention.errorcode.ShortLinkErrorCode;
 import com.plumliu.shorturl.common.convention.exception.ClientException;
 import com.plumliu.shorturl.domain.dto.ShortLinkCreateReqDTO;
@@ -46,11 +47,11 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         shortLinkDO.setFullShortUrl(fullShortUrl);
 
         UserLoginRespDTO user = Optional.ofNullable(UserContext.getUser())
-                .orElseThrow(() -> new ClientException("获取登录用户失败"));
+                .orElseThrow(() -> new ClientException(BaseErrorCode.INVALID_TOKEN));
 
         shortLinkDO.setUserId(user.getId());
         shortLinkDO.setCreateType(1);
-        shortLinkDO.setGid("default");
+        shortLinkDO.setGid(shortLinkCreateReqDTO.getGid() != null ? shortLinkCreateReqDTO.getGid() : "default");
         shortLinkDO.setEnableStatus(1);
 
         shortLinkDO.setDescription(shortLinkCreateReqDTO.getDescription());

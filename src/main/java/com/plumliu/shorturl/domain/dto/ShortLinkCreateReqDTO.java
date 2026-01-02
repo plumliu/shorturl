@@ -20,4 +20,6 @@ public class ShortLinkCreateReqDTO {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime validDate;
+
+    private String gid;
 }
