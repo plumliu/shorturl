@@ -1,13 +1,18 @@
 package com.plumliu.shorturl.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plumliu.shorturl.common.biz.user.UserContext;
 import com.plumliu.shorturl.common.convention.errorcode.BaseErrorCode;
+import com.plumliu.shorturl.common.convention.errorcode.GroupErrorCode;
 import com.plumliu.shorturl.common.convention.errorcode.ShortLinkErrorCode;
 import com.plumliu.shorturl.common.convention.exception.ClientException;
 import com.plumliu.shorturl.domain.dto.ShortLinkCreateReqDTO;
 import com.plumliu.shorturl.domain.dto.UserLoginRespDTO;
+import com.plumliu.shorturl.domain.entity.GroupDO;
 import com.plumliu.shorturl.domain.entity.ShortLinkDO;
+import com.plumliu.shorturl.domain.entity.UserDO;
+import com.plumliu.shorturl.mapper.GroupMapper;
 import com.plumliu.shorturl.mapper.ShortLinkMapper;
 import com.plumliu.shorturl.service.ShortLinkService;
 import com.plumliu.shorturl.utils.HashUtil;
@@ -23,6 +28,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLinkDO> implements ShortLinkService {
+
+    private final GroupMapper groupMapper;
 
     @Override
     public String createShortLink(ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
@@ -46,20 +53,35 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         shortLinkDO.setShortUri(shortUri);
         shortLinkDO.setFullShortUrl(fullShortUrl);
 
+        shortLinkDO.setEnableStatus(1);
+
+        shortLinkDO.setDescription(shortLinkCreateReqDTO.getDescription());
+
+        shortLinkDO.setValidDateType(shortLinkCreateReqDTO.getValidDateType());
+        shortLinkDO.setValidDate(shortLinkCreateReqDTO.getValidDate());
+
+        shortLinkDO.setTotalPv(0);
+        shortLinkDO.setTotalUv(0);
+        shortLinkDO.setTotalUip(0);
+
+        shortLinkDO.setCreateType(1);
+
         UserLoginRespDTO user = Optional.ofNullable(UserContext.getUser())
                 .orElseThrow(() -> new ClientException(BaseErrorCode.INVALID_TOKEN));
 
         shortLinkDO.setUserId(user.getId());
-        shortLinkDO.setCreateType(1);
-        shortLinkDO.setGid(shortLinkCreateReqDTO.getGid() != null ? shortLinkCreateReqDTO.getGid() : "default");
-        shortLinkDO.setEnableStatus(1);
 
-        shortLinkDO.setDescription(shortLinkCreateReqDTO.getDescription());
-        shortLinkDO.setValidDateType(shortLinkCreateReqDTO.getValidDateType());
-        shortLinkDO.setValidDate(shortLinkCreateReqDTO.getValidDate());
-        shortLinkDO.setTotalPv(0);
-        shortLinkDO.setTotalUv(0);
-        shortLinkDO.setTotalUip(0);
+        String gid = shortLinkCreateReqDTO.getGid();
+        if(gid == null) {
+            LambdaQueryWrapper<GroupDO> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(GroupDO::getUsername, user.getUsername())
+                    .eq(GroupDO::getName, "默认分组");
+            GroupDO defaultGroup = Optional.ofNullable(groupMapper.selectOne(queryWrapper))
+                    .orElseThrow(() -> new ClientException(GroupErrorCode.DEFAULT_GROUP_NOT_EXISTS));
+            gid = defaultGroup.getGid();
+        }
+        shortLinkDO.setGid(gid);
+
 
         try {
             baseMapper.insert(shortLinkDO);

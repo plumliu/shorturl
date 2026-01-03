@@ -10,26 +10,29 @@ import com.plumliu.shorturl.domain.dto.UserLoginReqDTO;
 import com.plumliu.shorturl.domain.dto.UserLoginRespDTO;
 import com.plumliu.shorturl.domain.dto.UserRegisterReqDTO;
 import com.plumliu.shorturl.domain.entity.UserDO;
+import com.plumliu.shorturl.mapper.GroupMapper;
 import com.plumliu.shorturl.mapper.UserMapper;
+import com.plumliu.shorturl.service.GroupService;
 import com.plumliu.shorturl.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {
+
+    private final GroupService groupService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -95,12 +98,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     }
 
     @Override
+    @Transactional(rollbackFor = {ClientException.class, RuntimeException.class})
     public void register(UserRegisterReqDTO userRegisterReqDTO) {
         UserDO userDO = BeanUtil.toBean(userRegisterReqDTO, UserDO.class);
         userDO.setPassword(passwordEncoder.encode(userRegisterReqDTO.getPassword()));
 
         try {
             baseMapper.insert(userDO);
+            groupService.createGroupWithoutUser(userRegisterReqDTO.getUsername(), "默认分组");
+
         } catch (DuplicateKeyException ex) {
             throw new ClientException(ex.getMessage(), UserErrorCode.USER_EXIST);
         }

@@ -9,7 +9,15 @@ public interface GroupService extends IService<GroupDO> {
 
     /***
      * @param groupCreateReqDTO 创建组别请求dto
+     * @return 创建的分组信息
      */
     GroupCreateRespDTO createGroup(GroupCreateReqDTO groupCreateReqDTO);
 
+    /**
+     * 新增短链接分组
+     * @param username 用户名
+     * @param groupName 分组名
+     * @return 创建的分组信息
+     */
+    GroupCreateRespDTO createGroupWithoutUser(String username, String groupName);
 }
